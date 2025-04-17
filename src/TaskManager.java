@@ -3,7 +3,7 @@ import java.util.HashMap;
 
 public class TaskManager {
 
-    int idCounter = 1;
+    private int idCounter = 1;
 
 
     public HashMap<Integer, Subtask> subtaskList = new HashMap<>();
@@ -11,54 +11,56 @@ public class TaskManager {
     public HashMap<Integer, Task> taskList = new HashMap<>();
 
 
-
-    ArrayList<Epic> getAllEpic() {
+    ArrayList<Epic> getAllEpics() {
         return new ArrayList<>(epicList.values());
     }
 
-    public void getAllTask(Task task){
-        System.out.println(taskList.toString());
+    ArrayList<Task> getAllTasks() {
+        return new ArrayList<>(taskList.values());
     }
 
-    public void getAllSubtask(Subtask subtask){
-        System.out.println(subtaskList.toString());
+    ArrayList<Subtask> getAllSubtasks() {
+        return new ArrayList<>(subtaskList.values());
     }
 
-    public void deleteAllEpic(Epic epic){
+    public void deleteAllEpics(Epic epic) {
         epicList.clear();
     }
 
-    public void deleteAllTask(){
+    public void deleteAllTasks() {
         taskList.clear();
     }
 
-    public void deleteAllSubtask(Subtask subtask){
-       subtaskList.clear();
+    public void deleteAllSubtasks(Subtask subtask) {
+        subtaskList.clear();
     }
 
-    public void getEpicById(Long id) {
+    public Epic getEpicById(int id) {
+        return epicList.get(id);
+    }
+
+    public void getTaskById(int id) {
 
     }
 
-    public void getTaskById(Long id) {
-
-    }
-
-    public void getSubtaskById(Long id) {
+    public void getSubtaskById(int id) {
 
     }
 
     public void createEpic(Epic epic) {
+        epic.setId(idCounter);
         epicList.put(epic.setId(idCounter), epic);
         idCounter++;
     }
 
     public void createTask(Task task) {
+        task.setId(idCounter);
         taskList.put(task.setId(idCounter), task);
         idCounter++;
     }
 
     public void createSubtask(Subtask subtask) {
+        subtask.setId(idCounter);
         subtaskList.put(subtask.setId(idCounter), subtask);
         idCounter++;
     }
@@ -84,6 +86,14 @@ public class TaskManager {
             subtaskList.put(subtask.getId(), subtask);
         } else {
             System.out.println("Задача не сущесвует или у Вас нет к ней доступа.");
+        }
+    }
+
+    public void deleteEpicById (int id) {
+        if (epicList.containsKey(id)){
+            epicList.remove(id);
+        } else {
+            System.out.println("Такого эпика нет.");
         }
     }
 

@@ -20,7 +20,7 @@ public class Task {
 
     public int setId(int id) {
         this.id = id;
-        return 0;
+        return id;
     }
 
     public String getDescription() {
