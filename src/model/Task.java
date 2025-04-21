@@ -1,4 +1,5 @@
-import java.util.HashMap;
+package model;
+
 import java.util.Objects;
 
 public class Task {
