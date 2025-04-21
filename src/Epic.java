@@ -7,6 +7,7 @@ public class Epic extends Task {
 
     public Epic(String title, String description, Status status) {
         super(title, description, status);
+
     }
 
     public List<Integer> getSubtaskIds() {
@@ -21,14 +22,14 @@ public class Epic extends Task {
         subtaskIds.clear();
     }
 
-    public void removeSubtaskIds (int id) {
-        subtaskIds.remove(id);
-    }
-
     @Override
     public String toString() {
         return "Epic{" +
-                "subtaskIds=" + getSubtaskIds() +
-                "} " + super.toString();
+                "name='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", id=" + getId() +
+                ", status=" + getStatus() +
+                ", subtaskIds=" + getSubtaskIds() +
+                '}';
     }
 }
