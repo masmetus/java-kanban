@@ -5,41 +5,40 @@ public class Main {
     public static void main(String[] args) {
 
 
-        System.out.println(" ");
         TaskManager taskManager = new TaskManager();
-        Epic epic = new Epic("Тест1","Ахахахахха Тест1", Status.NEW);
-        Epic epic2 = new Epic("Тест2","Ахахахахха Тест2", Status.IN_PROGRESS);
+        Epic epic = new Epic("Жопа", "Ахахахахха жопа", Status.NEW);
+        Epic epic1 = new Epic("Жопа2", "Ахахахахха жопа2", Status.NEW);
 
-        Subtask subtask = new Subtask("Таска","Пакса", Status.DONE);
+        taskManager.createEpic(epic);
+        taskManager.createEpic(epic1);
 
-       taskManager.createEpic(epic);
-       taskManager.createEpic(epic2);
+        Subtask subtask = new Subtask("Переезд", "Тудасюда", Status.NEW, epic1.getId());
+        //Subtask subtask2 = new Subtask("Переезд2", "Тудасюда2", Status.NEW, 99999);
 
-        taskManager.createSubtask(subtask);
+        taskManager.createSubtask(subtask, epic1.getId());
+        //taskManager.createSubtask(subtask2, epic.getId());
 
-        System.out.println(taskManager.getAllEpics().toString());
-        System.out.println(taskManager.getAllSubtasks().toString());
-        System.out.println(" ");
-        System.out.println("---".repeat(20));
-        System.out.println(" ");
+        //System.out.println("До удаления все эпики " + taskManager.getAllEpic().toString());
+        //System.out.println("До удаления все подзадачи " + taskManager.getAllSubtask().toString());
 
-        System.out.println(taskManager.getEpicById(2) + " Это ваш эпик");
-        System.out.println("Я только что удалил его!");
-        taskManager.deleteEpicById(2);
+        //System.out.println("До удаления " + taskManager.getEpicById(2));
+        //System.out.println("До удаления " + taskManager.getSubtaskById(3));
 
-        System.out.println(" ");
-        System.out.println("---".repeat(20));
-        System.out.println(" ");
-        System.out.println("Видишь, его тут нет: " + taskManager.getAllEpics().toString());
+        System.out.println("До удаления " + taskManager.getAllSubtaskOfEpic(2));
+
+        //taskManager.removeAllSubtask();
+        taskManager.removeSubtaskById(3);
 
 
-        System.out.println(" ");
-        System.out.println("---".repeat(20));
-        System.out.println(" ");
-        Epic epic3 = new Epic("Тест3","Ахахахахха Тест3", Status.IN_PROGRESS);
-        taskManager.createEpic(epic3);
-        System.out.println("И создал новый. Теперь в списке другой эпик: " + taskManager.getAllEpics().toString());
+        //taskManager.deleteEpicById(2);
 
+        //System.out.println("До удаления " + taskManager.getAllSubtaskOfEpic(666));
 
+        System.out.println("После удаления все эпики " + taskManager.getAllEpic().toString());
+        System.out.println("После удаления все подзадачи " + taskManager.getAllSubtask().toString());
+
+        //System.out.println("После удаления эпика " + taskManager.getEpicById(2));
+
+        //System.out.println(taskManager.getEpicById(255));
     }
 }
