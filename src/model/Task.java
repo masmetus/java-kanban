@@ -24,6 +24,11 @@ public class Task {
     }
 
     public void setId(int id) {
+        if (this.id != 0 && this.id != id) {
+            System.out.println("ID нельзя изменить после установки!");
+            return;
+        }
+
         this.id = id;
     }
 
