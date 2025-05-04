@@ -121,4 +121,48 @@ class InMemoryTaskManagerTest {
         assertEquals(subtask.getEpicId(), epicId, "Идентификатор эпика должен совпадать!");
     }
 
+    @Test
+    public void updateEpic() {
+
+        Epic epic = new Epic("Основной", "Основной", Status.NEW);
+        taskManager.createEpic(epic);
+
+        Epic epic1 = new Epic("Для теста обновления", "Обновление", Status.NEW);
+        epic1.setId(epic.getId());
+
+        taskManager.updateEpic(epic1);
+
+        Subtask subtask = new Subtask("Я подзадача", " Я описание её", Status.DONE, epic.getId());
+        taskManager.createSubtask(subtask, epic.getId());
+
+        assertEquals(epic, epic1, "Эпик не обновился!");
+
+    }
+
+
+    @Test
+    public void checkingWhatAfterRemoveAllEpicRemovedAllSubtasksEverywhere() {
+
+        Epic epic = new Epic("Основной", "Основной", Status.NEW);
+        taskManager.createEpic(epic);
+
+        Epic epic1 = new Epic("Для теста обновления", "Обновление", Status.NEW);
+        taskManager.createEpic(epic1);
+
+        Subtask subtask = new Subtask("Я подзадача", " Я описание её", Status.DONE, epic.getId());
+        taskManager.createSubtask(subtask, epic.getId());
+
+        assertFalse(taskManager.getAllEpic().isEmpty());
+        assertFalse(taskManager.getAllSubtask().isEmpty());
+        assertFalse(epic.getSubtaskIds().isEmpty());
+
+        taskManager.removeAllEpic();
+
+        assertTrue(taskManager.getAllEpic().isEmpty());
+        assertTrue(taskManager.getAllSubtask().isEmpty());
+        assertTrue(epic.getSubtaskIds().isEmpty());
+
+
+    }
+
 }

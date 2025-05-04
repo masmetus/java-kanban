@@ -21,8 +21,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager = new InMemoryHistoryManager();
 
 
-
-
     //Методы задачи
     @Override
     public void createTask(Task task) {
@@ -75,6 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createEpic(Epic epic) {
         epic.setId(idCounter++);
+        epic.setStatus(Status.NEW);
         epicMap.put(epic.getId(), epic);
     }
 
@@ -96,12 +95,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllEpic() {
+        //В рамках эпика лежит лист сабтасков, его тоже надо чистить
         for (Epic epic : epicMap.values()) {
-            List<Integer> subtaskIds = new ArrayList<>(epic.getSubtaskIds());
-            for (Integer subtaskId : subtaskIds) {
-                subtaskMap.remove(subtaskId);
-            }
+            epic.removeAllSubtaskIds();
         }
+        subtaskMap.clear();
         epicMap.clear();
     }
 
@@ -122,21 +120,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Epic updatedEpic) {
-        if (!epicMap.containsKey(updatedEpic.getId())) {
+        Epic existingEpic = epicMap.get(updatedEpic.getId());
+        if (existingEpic == null) {
             System.out.println("Эпик не существует или у Вас нет к нему доступа.");
             return;
 
         }
-
-        Epic epic = epicMap.get(updatedEpic.getId());
-        List<Integer> subtaskIds = new ArrayList<>(epic.getSubtaskIds());
-        epic.setId(updatedEpic.getId());
-        epicMap.put(updatedEpic.getId(), updatedEpic);
-
-        epic.getSubtaskIds().clear();
-        epic.getSubtaskIds().addAll(subtaskIds);
-
-        updatedEpic.setId(updatedEpic.getId());
+        existingEpic.setTitle(updatedEpic.getTitle());
+        existingEpic.setDescription(updatedEpic.getDescription());
 
     }
 
@@ -215,16 +206,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeSubtaskById(int id) {
+    public void removeSubtaskById(Integer id) {
         Subtask subtask = subtaskMap.get(id);
         if (subtask == null) {
             System.out.println("Подзадачи с идентификатором " + id + " нет!");
             return;
         }
-
-        //Удаляем связь этой подзадачи и эпика
-        //Дальше по эпику. Если у него больше не осталось подзадач, то мы его в NEW
-        //Если остались, то ничего
 
         int epicId = subtask.getEpicId();
         Epic epic = epicMap.get(epicId);
@@ -233,7 +220,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        epic.getSubtaskIds().remove(Integer.valueOf(id));
+        epic.getSubtaskIds().remove(id);
         subtaskMap.remove(id);
 
         updateEpicStatus(epic);

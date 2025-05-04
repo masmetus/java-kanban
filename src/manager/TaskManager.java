@@ -40,7 +40,7 @@ public interface TaskManager {
 
     void removeAllSubtask();
 
-    void removeSubtaskById(int id);
+    void removeSubtaskById(Integer id);
 
     Subtask getSubtaskById(int id);
 
