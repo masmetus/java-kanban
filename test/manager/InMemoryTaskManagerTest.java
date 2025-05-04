@@ -122,7 +122,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void updateEpic() {
+    public void checkingWhatEpicUpdatedCorrect() {
 
         Epic epic = new Epic("Основной", "Основной", Status.NEW);
         taskManager.createEpic(epic);
