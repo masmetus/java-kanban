@@ -2,33 +2,101 @@ package manager;
 
 import model.Task;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
     private static final int HISTORY_LIMIT = 10;
 
-    private final LinkedList<Task> history = new LinkedList<>();
+    private final CustomLinkedList history = new CustomLinkedList();
+
+    private final Map<Integer, Node<Task>> historyMap = new HashMap<>();
+
+    private static class Node<T> {
+        T data;
+
+        Node<T> prev;
+        Node<T> next;
+
+        Node(T data) {
+            this.data = data;
+        }
+    }
+
+
+    private static class CustomLinkedList {
+        Node<Task> head;
+        Node<Task> tail;
+
+        void linkLast(Task task, Node<Task> node) {
+            if (tail == null) {
+                head = tail = node;
+            } else {
+                tail.next = node;
+                node.prev = tail;
+                tail = node;
+            }
+        }
+
+        void removeNode(Node<Task> node) {
+            if (node == null) return;
+
+            if (node.prev != null) {
+                node.prev.next = node.next;
+            } else {
+                head = node.next;
+            }
+
+            if (node.next != null) {
+                node.next.prev = node.prev;
+            } else {
+                tail = node.prev;
+            }
+        }
+
+        List<Task> getTasks() {
+            List<Task> tasks = new ArrayList<>();
+            Node<Task> current = head;
+            while (current != null) {
+                tasks.add(current.data);
+                current = current.next;
+            }
+            return tasks;
+        }
+    }
+
 
     @Override
     public void add(Task task) {
-        if (task == null) {
-            return;
-        }
-        //без проверки, так как, если я правильно понял то что сказано в описании метода удаления, он делает это сам
-        //history.remove(task);
+        if (task == null) return;
 
-        if (history.size() == HISTORY_LIMIT) {
-            history.removeFirst();
+        // Удаляем задачу, если она уже присутствует
+        if (historyMap.containsKey(task.getId())) {
+            remove(task.getId());
         }
-        history.add(task);
+
+        // Добавляем новую задачу в конец
+        Node<Task> newNode = new Node<>(task);
+        history.linkLast(task, newNode);
+        historyMap.put(task.getId(), newNode);
+
+        // Ограничиваем размер истории
+        if (historyMap.size() > HISTORY_LIMIT) {
+            remove(history.head.data.getId());
+        }
     }
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
+        return history.getTasks();
+    }
+
+    @Override
+    public void remove(int id) {
+        Node<Task> node = historyMap.remove(id);
+        if (node != null) {
+            history.removeNode(node);
+        }
     }
 
 }
