@@ -36,32 +36,37 @@ class InMemoryHistoryManagerTest {
 
     //убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.
     @Test
-    public void historyManagerShouldKeepDifferentVersionsOfTask(){
+    public void historyManagerShouldKeepOnlyLastTaskView(){
         Task task = new Task("Тестовая задачка", "И такое же описание", Status.IN_PROGRESS);
         taskManager.createTask(task);
 
         taskManager.getTaskById(task.getId());
 
-        assertEquals(task.getId(), taskManager.getHistory().get(0).getId());
-        assertEquals(task.getTitle(), taskManager.getHistory().get(0).getTitle());
-        assertEquals(task.getDescription(), taskManager.getHistory().get(0).getDescription());
-        assertEquals(task.getStatus(), taskManager.getHistory().get(0).getStatus());
+        assertEquals(1, taskManager.getHistory().size());
+        Task firstView = taskManager.getHistory().get(0);
+        assertEquals(task.getId(), firstView.getId());
+        assertEquals(task.getTitle(), firstView.getTitle());
+        assertEquals(task.getDescription(), firstView.getDescription());
+        assertEquals(task.getStatus(), firstView.getStatus());
 
-        Task updateTask = new Task("Обновленная задача", "Обновленное описание", Status.DONE);
-        updateTask.setId(task.getId());
-        taskManager.updateTask(updateTask);
+        // Обновляем задачу
+        Task updatedTask = new Task("Обновленная задача", "Обновленное описание", Status.DONE);
+        updatedTask.setId(task.getId());
+        taskManager.updateTask(updatedTask);
 
-        taskManager.getTaskById(updateTask.getId());
+        //Смотрим её и убеждаемся, что там только одна задача
+        taskManager.getTaskById(updatedTask.getId());
 
-        assertEquals(updateTask.getId(), taskManager.getHistory().get(1).getId());
+        assertEquals(1, taskManager.getHistory().size());
+        Task lastView = taskManager.getHistory().get(0);
+        assertEquals(updatedTask.getId(), lastView.getId());
+        assertEquals(updatedTask.getTitle(), lastView.getTitle());
+        assertEquals(updatedTask.getDescription(), lastView.getDescription());
+        assertEquals(updatedTask.getStatus(), lastView.getStatus());
 
-        assertEquals(updateTask.getTitle(), taskManager.getHistory().get(1).getTitle());
-        assertNotEquals(updateTask.getTitle(), taskManager.getHistory().get(0).getTitle());
-
-        assertEquals(updateTask.getDescription(), taskManager.getHistory().get(1).getDescription());
-        assertNotEquals(updateTask.getDescription(), taskManager.getHistory().get(0).getDescription());
-
-        assertEquals(updateTask.getStatus(), taskManager.getHistory().get(1).getStatus());
-        assertNotEquals(updateTask.getStatus(), taskManager.getHistory().get(0).getStatus());
+        // Убеждаемся, что это действительно обновленная версия
+        assertNotEquals(task.getTitle(), lastView.getTitle());
+        assertNotEquals(task.getDescription(), lastView.getDescription());
+        assertNotEquals(task.getStatus(), lastView.getStatus());
     }
 }
