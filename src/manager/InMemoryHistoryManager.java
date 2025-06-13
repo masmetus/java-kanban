@@ -6,8 +6,6 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private static final int HISTORY_LIMIT = 10;
-
     private final CustomLinkedList history = new CustomLinkedList();
 
     private final Map<Integer, Node<Task>> historyMap = new HashMap<>();
@@ -70,20 +68,15 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         if (task == null) return;
 
-        // Удаляем задачу, если она уже присутствует
-        if (historyMap.containsKey(task.getId())) {
-            remove(task.getId());
+        final int taskId = task.getId();
+
+        if (historyMap.containsKey(taskId)) {
+            remove(taskId);
         }
 
-        // Добавляем новую задачу в конец
         Node<Task> newNode = new Node<>(task);
         history.linkLast(task, newNode);
-        historyMap.put(task.getId(), newNode);
-
-        // Ограничиваем размер истории
-        if (historyMap.size() > HISTORY_LIMIT) {
-            remove(history.head.data.getId());
-        }
+        historyMap.put(taskId, newNode);
     }
 
     @Override
