@@ -4,7 +4,6 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class FileBackedTaskManagerTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        tmpFile = File.createTempFile("tasks",".csv");
+        tmpFile = File.createTempFile("tasks", ".csv");
         manager = new FileBackedTaskManager(tmpFile);
     }
 
@@ -35,7 +34,7 @@ public class FileBackedTaskManagerTest {
     @Test
     void testFileCreatedOnFirstOperation() throws IOException {
         assertTrue(tmpFile.exists());
-        assertEquals(0,tmpFile.length());
+        assertEquals(0, tmpFile.length());
 
         manager.createTask(new Task("Test", "Desc", Status.NEW));
 
