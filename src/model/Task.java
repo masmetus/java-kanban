@@ -1,10 +1,14 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
 
 
+    private Duration duration;
+    private LocalDateTime startTime;
     private String title;
     private String description;
     private int id;
@@ -15,7 +19,14 @@ public class Task {
         this.description = description;
         this.status = status;
     }
-
+    public Task(String title, String description, Status status,
+                LocalDateTime startTime, Duration duration) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
     public Status getStatus() {
         return status;
     }
@@ -51,6 +62,30 @@ public class Task {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    //Почему приоритет у нас это дата выполнения, а не отдельное поле приоритет, как в джире - загадка
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime == null || duration == null) {
+            return null;
+        }
+        return startTime.plus(duration);
     }
 
     @Override
