@@ -19,6 +19,7 @@ public class Task {
         this.description = description;
         this.status = status;
     }
+
     public Task(String title, String description, Status status,
                 LocalDateTime startTime, Duration duration) {
         this.title = title;
@@ -27,6 +28,7 @@ public class Task {
         this.startTime = startTime;
         this.duration = duration;
     }
+
     public Status getStatus() {
         return status;
     }
