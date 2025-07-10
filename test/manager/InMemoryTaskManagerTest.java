@@ -170,26 +170,21 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
     @Test
     void epicStatusCalculation() {
-        // Тесты для статусов Epic
         Epic epic = new Epic("Epic", "Desc", Status.NEW);
         taskManager.createEpic(epic);
 
-        // a. Все подзадачи NEW
         Subtask subtask1 = new Subtask("Sub1", "Desc", Status.NEW, epic.getId());
         taskManager.createSubtask(subtask1, epic.getId());
         assertEquals(Status.NEW, epic.getStatus());
 
-        // b. Все подзадачи DONE
         subtask1.setStatus(Status.DONE);
         taskManager.updateSubtask(subtask1);
         assertEquals(Status.DONE, epic.getStatus());
 
-        // c. NEW и DONE
         Subtask subtask2 = new Subtask("Sub2", "Desc", Status.NEW, epic.getId());
         taskManager.createSubtask(subtask2, epic.getId());
         assertEquals(Status.IN_PROGRESS, epic.getStatus());
 
-        // d. IN_PROGRESS
         subtask1.setStatus(Status.IN_PROGRESS);
         taskManager.updateSubtask(subtask1);
         assertEquals(Status.IN_PROGRESS, epic.getStatus());

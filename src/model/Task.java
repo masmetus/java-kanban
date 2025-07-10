@@ -66,7 +66,6 @@ public class Task {
         this.description = description;
     }
 
-    //Почему приоритет у нас это дата выполнения, а не отдельное поле приоритет, как в джире - загадка
     public LocalDateTime getStartTime() {
         return startTime;
     }
