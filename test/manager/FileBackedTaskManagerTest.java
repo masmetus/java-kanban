@@ -8,7 +8,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
@@ -159,5 +161,25 @@ class FileBackedTaskManagerTest {
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tmpFile);
         assertEquals(task1.getId(), loaded.getAllTask().get(0).getId(),
                 "Порядок задач должен сохраняться");
+    }
+
+    @Test
+    void shouldCleanupOrphanedSubtasks() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tmpFile))) {
+            writer.write("id,type,name,status,description,startTime,duration,epic\n");
+            writer.write("1,EPIC,Epic,NEW,Desc,,,\n");
+            writer.write("2,SUBTASK,Orphaned,NEW,Orphaned desc,,,999\n");
+            writer.write("3,SUBTASK,Valid,NEW,Valid desc,,,1\n");
+            writer.write("\n\n");
+        }
+        FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(tmpFile);
+
+        List<Subtask> subtasks = manager.getAllSubtask();
+        assertEquals(1, subtasks.size(), "Должна остаться только одна подзадача");
+        assertEquals("Valid", subtasks.get(0).getTitle(), "Должна остаться корректная подзадача");
+
+        Epic epic = manager.getEpicById(1);
+        assertEquals(1, epic.getSubtaskIds().size(), "Эпик должен содержать одну подзадачу");
+        assertEquals(3, epic.getSubtaskIds().get(0), "Это должна быть подзадача с id=3");
     }
 }

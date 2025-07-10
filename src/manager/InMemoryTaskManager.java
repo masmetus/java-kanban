@@ -14,10 +14,10 @@ public class InMemoryTaskManager implements TaskManager {
     private int idCounter = 1;
 
 
-    final Map<Integer, Subtask> subtaskMap = new HashMap<>();
-    final Map<Integer, Epic> epicMap = new HashMap<>();
-    final Map<Integer, Task> taskMap = new HashMap<>();
-    final HistoryManager historyManager = new InMemoryHistoryManager();
+    protected final Map<Integer, Subtask> subtaskMap = new HashMap<>();
+    protected final Map<Integer, Epic> epicMap = new HashMap<>();
+    protected final Map<Integer, Task> taskMap = new HashMap<>();
+    protected final HistoryManager historyManager = new InMemoryHistoryManager();
     private final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator
             .comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
             .thenComparingInt(Task::getId));
