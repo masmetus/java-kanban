@@ -5,68 +5,106 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
-    private TaskManager taskManager;
+    private HistoryManager historyManager;
+    private Task task1;
+    private Task task2;
+    private Task task3;
 
     @BeforeEach
-    public void setUp() {
-        taskManager = new InMemoryTaskManager();
+    void setUp() {
+        historyManager = new InMemoryHistoryManager();
+        task1 = new Task("Task 1", "Description 1", Status.NEW);
+        task1.setId(1);
+        task2 = new Task("Task 2", "Description 2", Status.IN_PROGRESS);
+        task2.setId(2);
+        task3 = new Task("Task 3", "Description 3", Status.DONE);
+        task3.setId(3);
     }
 
     @Test
-    public void getHistoryTest() {
-        Task task = new Task("Тестовая задачка", "И такое же описание", Status.DONE);
-        taskManager.createTask(task);
-
-        // Получаем задачу, чтобы добавить её в историю
-        taskManager.getTaskById(task.getId());
-
-        // Проверяем, что история содержит 1 задачу
-        assertEquals(1, taskManager.getHistory().size());
-        assertEquals(task, taskManager.getHistory().get(0));
+    void getHistoryTest() {
+        historyManager.add(task1);
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task1, history.get(0));
     }
 
     @Test
-    public void testInitialization() {
-        assertNotNull(taskManager);
+    void testInitialization() {
+        assertNotNull(historyManager);
     }
 
     //убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.
     @Test
-    public void historyManagerShouldKeepOnlyLastTaskView(){
-        Task task = new Task("Тестовая задачка", "И такое же описание", Status.IN_PROGRESS);
-        taskManager.createTask(task);
+    void historyManagerShouldKeepOnlyLastTaskView() {
+        historyManager.add(task1);
+        Task updatedTask = new Task("Updated", "Desc", Status.DONE);
+        updatedTask.setId(task1.getId());
+        historyManager.add(updatedTask);
 
-        taskManager.getTaskById(task.getId());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(updatedTask.getTitle(), history.get(0).getTitle());
+    }
 
-        assertEquals(1, taskManager.getHistory().size());
-        Task firstView = taskManager.getHistory().get(0);
-        assertEquals(task.getId(), firstView.getId());
-        assertEquals(task.getTitle(), firstView.getTitle());
-        assertEquals(task.getDescription(), firstView.getDescription());
-        assertEquals(task.getStatus(), firstView.getStatus());
+    @Test
+    void emptyHistory() {
+        assertTrue(historyManager.getHistory().isEmpty());
+    }
 
-        // Обновляем задачу
-        Task updatedTask = new Task("Обновленная задача", "Обновленное описание", Status.DONE);
-        updatedTask.setId(task.getId());
-        taskManager.updateTask(updatedTask);
+    @Test
+    void noDuplicatesInHistory() {
+        historyManager.add(task1);
+        historyManager.add(task1);
+        assertEquals(1, historyManager.getHistory().size());
+    }
 
-        //Смотрим её и убеждаемся, что там только одна задача
-        taskManager.getTaskById(updatedTask.getId());
+    @Test
+    void removeFromBeginningOfHistory() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
 
-        assertEquals(1, taskManager.getHistory().size());
-        Task lastView = taskManager.getHistory().get(0);
-        assertEquals(updatedTask.getId(), lastView.getId());
-        assertEquals(updatedTask.getTitle(), lastView.getTitle());
-        assertEquals(updatedTask.getDescription(), lastView.getDescription());
-        assertEquals(updatedTask.getStatus(), lastView.getStatus());
+        historyManager.remove(task1.getId());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task2, history.get(0));
+    }
 
-        // Убеждаемся, что это действительно обновленная версия
-        assertNotEquals(task.getTitle(), lastView.getTitle());
-        assertNotEquals(task.getDescription(), lastView.getDescription());
-        assertNotEquals(task.getStatus(), lastView.getStatus());
+    @Test
+    void removeFromMiddleOfHistory() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task2.getId());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertFalse(history.contains(task2));
+    }
+
+    @Test
+    void removeFromEndOfHistory() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task3.getId());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task2, history.get(1));
+    }
+
+    @Test
+    void removeNonExistentTaskFromHistory() {
+        historyManager.add(task1);
+        historyManager.remove(999); // Несуществующий ID
+        assertEquals(1, historyManager.getHistory().size());
     }
 }

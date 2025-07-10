@@ -7,12 +7,17 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
-    private TaskManager taskManager;
-
+    @Override
+    protected InMemoryTaskManager createTaskManager() {
+        return new InMemoryTaskManager();
+    }
 
     @BeforeEach
     public void setUp() {
@@ -161,8 +166,39 @@ class InMemoryTaskManagerTest {
         assertTrue(taskManager.getAllEpic().isEmpty());
         assertTrue(taskManager.getAllSubtask().isEmpty());
         assertTrue(epic.getSubtaskIds().isEmpty());
-
-
     }
+
+    @Test
+    void epicStatusCalculation() {
+        Epic epic = new Epic("Epic", "Desc", Status.NEW);
+        taskManager.createEpic(epic);
+
+        Subtask subtask1 = new Subtask("Sub1", "Desc", Status.NEW, epic.getId());
+        taskManager.createSubtask(subtask1, epic.getId());
+        assertEquals(Status.NEW, epic.getStatus());
+
+        subtask1.setStatus(Status.DONE);
+        taskManager.updateSubtask(subtask1);
+        assertEquals(Status.DONE, epic.getStatus());
+
+        Subtask subtask2 = new Subtask("Sub2", "Desc", Status.NEW, epic.getId());
+        taskManager.createSubtask(subtask2, epic.getId());
+        assertEquals(Status.IN_PROGRESS, epic.getStatus());
+
+        subtask1.setStatus(Status.IN_PROGRESS);
+        taskManager.updateSubtask(subtask1);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus());
+    }
+
+    @Test
+    void timeOverlapDetection() {
+        LocalDateTime now = LocalDateTime.now();
+        Task task1 = new Task("Task1", "Desc", Status.NEW, now, Duration.ofMinutes(30));
+        Task task2 = new Task("Task2", "Desc", Status.NEW, now.plusMinutes(15), Duration.ofMinutes(30));
+
+        taskManager.createTask(task1);
+        assertThrows(ManagerSaveException.class, () -> taskManager.createTask(task2));
+    }
+
 
 }
