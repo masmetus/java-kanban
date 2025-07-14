@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class Task {
 
-
     private Duration duration;
     private LocalDateTime startTime;
     private String title;

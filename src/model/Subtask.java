@@ -25,11 +25,7 @@ public class Subtask extends Task {
     @Override
     public String toString() {
         return "Subtask{" +
-                "name='" + getTitle() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", id=" + getId() +
-                ", status=" + getStatus() +
-                ", epicId=" + getEpicId() +
-                '}';
+                "epicId=" + epicId +
+                "} " + super.toString();
     }
 }

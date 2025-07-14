@@ -61,8 +61,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!taskMap.containsKey(id)) {
             throw new ManagerSaveException("Задача с идентификатором " + id + " не найдена", null);
         }
-        taskMap.remove(id);
         removeFromPrioritized(taskMap.get(id));
+        taskMap.remove(id);
     }
 
     @Override
@@ -79,7 +79,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new ManagerSaveException("Обновленная задача пересекается по времени", null);
         }
 
-        // Сохраняем существующий ID (без вызова setId)
         taskMap.put(existing.getId(), updatedTask);
         addToPrioritized(updatedTask);
     }
@@ -121,17 +120,24 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpicById(int id) {
-        Epic epic = epicMap.remove(id);
+        Epic epic = epicMap.get(id);
+
         if (epic == null) {
             throw new ManagerSaveException("Эпик с идентификатором " + id + " не найден", null);
         }
 
-        for (Integer subtaskId : epic.getSubtaskIds()) {
-            Subtask subtask = subtaskMap.remove(subtaskId);
-            if (subtask != null) {
-                removeFromPrioritized(subtask);
-            }
+        List<Integer> subtaskIds = epic.getSubtaskIds();
+        if (subtaskIds != null && !subtaskIds.isEmpty()) {
+            new ArrayList<>(subtaskIds).forEach(subtaskId -> {
+                Subtask subtask = subtaskMap.remove(subtaskId);
+                if (subtask != null) {
+                    removeFromPrioritized(subtask);
+                    historyManager.remove(subtaskId);
+                }
+            });
         }
+        epicMap.remove(id);
+
     }
 
     @Override
@@ -220,7 +226,8 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epicMap.get(epicId);
 
         if (epic != null) {
-            epic.getSubtaskIds().remove(id);
+            epic.removeSubtaskId(id);
+            //epic.getSubtaskIds().remove(id);
             updateEpicStatus(epic);
             updateEpicTime(epicId);
         }
