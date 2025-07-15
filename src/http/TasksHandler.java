@@ -1,38 +1,19 @@
 package http;
 
-import adapter.DurationAdapter;
-import adapter.LocalDateTimeAdapter;
-import adapter.StatusAdapter;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.InMemoryTaskManager;
 import manager.ManagerSaveException;
-import model.Status;
 import model.Task;
 
-
 import java.io.IOException;
-
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
-    private final InMemoryTaskManager managers;
-    private final Gson gson;
 
 
     public TasksHandler(InMemoryTaskManager managers) {
-        this.managers = managers;
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(Status.class, new StatusAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .setPrettyPrinting()
-                .serializeNulls()
-                .create();
+        super(managers);
     }
 
     @Override
