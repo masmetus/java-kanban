@@ -25,7 +25,7 @@ public class BaseHttpHandler {
         this.gson = createGson();
     }
 
-    protected Gson createGson(){
+    protected Gson createGson() {
         return new GsonBuilder()
                 .registerTypeAdapter(Status.class, new StatusAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -42,7 +42,6 @@ public class BaseHttpHandler {
         exchange.getResponseBody().write(resp);
         exchange.close();
     }
-
 
 
     protected void sendNotFound(HttpExchange exchange) throws IOException {
